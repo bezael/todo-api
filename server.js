@@ -4,14 +4,38 @@ const express = require('express');
 const app = express();
 let _ = require('underscore');
 
-let todos =[];
+let todos =[
+		{
+		    "description": "Mansion",
+		    "completed": false,
+		    "id": 1
+		},
+		{
+		    "description": "Apart",
+		    "completed": true,
+		    "id": 2
+		},
+		{
+		    "description": "Casa",
+		    "completed": false,
+		    "id": 3
+		},
+		{
+		    "description": "Finca",
+		    "completed": false,
+		    "id": 4
+		}
+];
 let todoNextId=1;
 
 app.use(bodyParser.json());
 
-app.get('/', function(req, res){
-	res.send('Todo-api ROOT');
-});
+// app.get('/', function(req, res){
+// 	res.send('Todo-api ROOT');
+// });
+
+app.use(express.static(__dirname+'/public'));
+
 
 //GET /todos
 app.get('/todos', (req, res)=>{
