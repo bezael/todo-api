@@ -30,9 +30,9 @@ let todoNextId=1;
 
 app.use(bodyParser.json());
 
-// app.get('/', function(req, res){
-// 	res.send('Todo-api ROOT');
-// });
+app.get('/', function(req, res){
+	res.send('Todo-api ROOT');
+});
 
 app.use(express.static(__dirname+'/public'));
 
