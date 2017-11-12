@@ -87,30 +87,32 @@ app.delete('/todos/:id', (req, res) => {
 //PUT /todos/:id
 app.put('/todos/:id', (req, res) => {
 	let todoId = parseInt(req.params.id, 10);
-	let matchedTodo = _.findWhere(todos, {
-		id: todoId
+	let body = _.pick(req.body, 'description', 'completed');
+	let attributes = {};
+
+	if (body.hasOwnProperty('completed')) {
+		attributes.completed = body.completed;
+	} 
+
+	if (body.hasOwnProperty('description') ) {
+		attributes.description = body.description;
+	}
+
+	db.todo.findById(todoId).then(function(todo){
+		if(todo){
+			todo.update(attributes).then(function(todo){
+			res.json(todo.toJSON());
+		}, function(e){
+			res.status(400).json(e);
+		});
+		}else{
+			res.status(404).send();
+		}
+	}, function(){
+		res.status(500).send();
 	});
 
-	let body = _.pick(req.body, 'description', 'completed');
-	let validAttibutes = {};
 
-	if (!matchedTodo) {
-		return res.status(404).send();
-	}
-
-	if (body.hasOwnProperty('completed') && _.isBoolean(body.completed)) {
-		validAttibutes.completed = body.completed;
-	} else if (body.hasOwnProperty('completed')) {
-		return res.status(400).send();
-	}
-
-	if (body.hasOwnProperty('description') && _.isString(body.description) && body.description.trim().length > 0) {
-		validAttibutes.description = body.description;
-	} else if (body.hasOwnProperty('description')) {
-		return res.status(400).send();
-	}
-	_.extend(matchedTodo, validAttibutes);
-	res.json(matchedTodo);
 });
 
 db.sequelize.sync().then(function(){
