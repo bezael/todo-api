@@ -4,39 +4,25 @@ const express = require('express');
 const app = express();
 let _ = require('underscore');
 
-let todos =[
-		{
-		    "description": "Mansion",
-		    "completed": false,
-		    "id": 1
-		},
-		{
-		    "description": "Apart",
-		    "completed": true,
-		    "id": 2
-		},
-		{
-		    "description": "Casa",
-		    "completed": false,
-		    "id": 3
-		},
-		{
-		    "description": "Finca",
-		    "completed": false,
-		    "id": 4
-		}
-];
+let todos =[];
 let todoNextId=1;
 
 app.use(bodyParser.json());
 
-
 app.use(express.static(__dirname+'/public'));
 
-
-//GET /todos
+//GET /todos?completed=true
 app.get('/todos', (req, res)=>{
-	res.json(todos);
+	let queryParams = req.query;
+	let filteredTodos = todos;
+
+	if(queryParams.hasOwnProperty('completed') && queryParams.completed==='true'){
+		filteredTodos = _.where(filteredTodos, {completed: true});		
+	}else if(queryParams.hasOwnProperty('completed') && queryParams.completed==='false'){
+		filteredTodos = _.where(filteredTodos, {completed: false});		
+	}
+
+	res.json(filteredTodos);
 });
 
 //GET /todos/:id
@@ -106,9 +92,6 @@ app.put('/todos/:id',(req, res)=>{
 	_.extend(matchedTodo, validAttibutes);
 	res.json(matchedTodo);
 });
-
-
-
 
 app.listen(port, function(){
 	console.log('Server running on port: '+ port);
