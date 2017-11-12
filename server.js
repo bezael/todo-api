@@ -2,7 +2,8 @@ const port = process.env.PORT || 3000;
 const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
-let _ = require('underscore');
+const _ = require('underscore');
+let db = require('./db.js');
 
 let todos = [];
 let todoNextId = 1;
@@ -53,14 +54,47 @@ app.get('/todos/:id', (req, res) => {
 app.post('/todos', (req, res) => {
 	let body = _.pick(req.body, 'description', 'completed');
 
-	if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
-		return res.status(400).send();
-	}
+	db.todo.create(body).then(function(todo){	
+		res.json(todo.toJSON());
+	}, function(e){
+		res.status(400).json(e);
+	});
 
-	body.description = body.description.trim();
-	body.id = todoNextId++;
-	todos.push(body);
-	res.json(todos);
+	// Todo.create({
+	// 	description: 'Pick up bread',		
+	// }).then(function(todo){
+	// 	return Todo.create({
+	// 		description: 'Clean office'
+	// 	});
+	// }).then(function(){
+	// 	// return Todo.findById(1);
+	// 	 return Todo.findAll({ 
+	// 	 	where: {
+	// 	 		description: {
+	// 	 			$like: '%office%'
+	// 	 		}
+	// 	 	}
+	// 	  });
+	// }).then(function(todos){
+	// 	if(todos){
+	// 		todos.forEach(function(todo){
+	// 			console.log(todo.toJSON());
+	// 		});
+			
+	// 	}else{
+	// 		console.log('no todos found!');
+	// 	}
+	// }).catch(function(e){
+	// 	console.log(e);
+	// });
+	// if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
+	// 	return res.status(400).send();
+	// }
+
+	// body.description = body.description.trim();
+	// body.id = todoNextId++;
+	// todos.push(body);
+	// res.json(todos);
 });
 
 
@@ -111,6 +145,8 @@ app.put('/todos/:id', (req, res) => {
 	res.json(matchedTodo);
 });
 
-app.listen(port, () => {
-	console.log('Server running on port: ' + port);
+db.sequelize.sync().then(function(){
+	app.listen(port, () => {
+		console.log('Server running on port: ' + port);
+	});	
 });
