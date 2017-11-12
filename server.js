@@ -39,15 +39,16 @@ app.get('/todos', (req, res) => {
 //GET /todos/:id
 app.get('/todos/:id', (req, res) => {
 	let todoId = parseInt(req.params.id, 10);
-	let matchedTodo = _.findWhere(todos, {
-		id: todoId
-	});
 
-	if (matchedTodo) {
-		res.json(matchedTodo);
-	} else {
-		res.status(404).send('Element not found!');
-	}
+	db.todo.findById(todoId).then(function(todo){		
+		if(!!todo){	
+			res.json(todo.toJSON());
+		}else{
+			res.status(404).json();
+		}
+	}, function(e){
+		res.status(500).send();
+	});		
 });
 
 // POST /todos
@@ -59,42 +60,6 @@ app.post('/todos', (req, res) => {
 	}, function(e){
 		res.status(400).json(e);
 	});
-
-	// Todo.create({
-	// 	description: 'Pick up bread',		
-	// }).then(function(todo){
-	// 	return Todo.create({
-	// 		description: 'Clean office'
-	// 	});
-	// }).then(function(){
-	// 	// return Todo.findById(1);
-	// 	 return Todo.findAll({ 
-	// 	 	where: {
-	// 	 		description: {
-	// 	 			$like: '%office%'
-	// 	 		}
-	// 	 	}
-	// 	  });
-	// }).then(function(todos){
-	// 	if(todos){
-	// 		todos.forEach(function(todo){
-	// 			console.log(todo.toJSON());
-	// 		});
-			
-	// 	}else{
-	// 		console.log('no todos found!');
-	// 	}
-	// }).catch(function(e){
-	// 	console.log(e);
-	// });
-	// if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
-	// 	return res.status(400).send();
-	// }
-
-	// body.description = body.description.trim();
-	// body.id = todoNextId++;
-	// todos.push(body);
-	// res.json(todos);
 });
 
 
