@@ -23,7 +23,7 @@ app.get('/todos', (req, res)=>{
 	}
 
 	if(queryParams.hasOwnProperty('q') && queryParams.q.length > 0){
-		filteredTodos = _.filter(filteredTodos, function(todo){ 
+		filteredTodos = _.filter(filteredTodos, (todo)=>{ 
 			return todo.description.toLowerCase().indexOf(queryParams.q)  > -1;
 		});		
 	}
@@ -99,6 +99,6 @@ app.put('/todos/:id',(req, res)=>{
 	res.json(matchedTodo);
 });
 
-app.listen(port, function(){
+app.listen(port, ()=>{
 	console.log('Server running on port: '+ port);
 });
