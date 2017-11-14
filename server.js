@@ -113,16 +113,16 @@ app.put('/todos/:id', (req, res) => {
 	});
 });
 
-app.post('/users',(req, res)=>{
+app.post('/users', function (req, res){
 	let body = _.pick(req.body, 'email','password');
-	db.user.create(body).then(function(newUser){
-		res.json(newUser.toJSON());
-	}, function(e){
+	db.user.create(body).then(function(user){
+		res.json(user.email);
+	}, (e)=>{
 		res.status(400).json(e);
 	});
 });
 
-db.sequelize.sync().then(function(){
+db.sequelize.sync().then(()=>{
 	app.listen(port, () => {
 		console.log('Server running on port: ' + port);
 	});	
