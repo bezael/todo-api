@@ -7,13 +7,15 @@ let db = require('./db.js');
 let bcrypt = require('bcrypt');
 let todos = [];
 let todoNextId = 1;
+const middleware = require('./middleware.js')(db);
 
 app.use(bodyParser.json());
 
 app.use(express.static(__dirname + '/public'));
 
 //GET /todos?completed=true&q=house
-app.get('/todos', (req, res) => {
+// app.get('/todos', (req, res) => {
+app.get('/todos', function(req, res){
 	let query = req.query;
 	let where={};
 	

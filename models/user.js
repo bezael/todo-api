@@ -43,26 +43,48 @@ module.exports = (sequelize, DataTypes)=>{
 			}
 		},
 		classMethods:{
-			// auth: function(body){
-			// 	return new Promise(function(resolve, reject){
-			// 		if ( typeof body.email === 'string' && typeof body.email != 'undefine' && body.email != '' && typeof body.password === 'string' && typeof body.password != 'undefine' && body.password != ''){
-			// 			user.findOne({
-			// 				where:{
-			// 					email: body.email
-			// 				}
-			// 			}).then(function(user){
-			// 				if(!user || !bcrypt.compareSync(body.password, user.get('password_hash'))){
-			// 					return reject();
-			// 				}
-			// 				resolve(user);
-			// 			}, function(e){
-			// 				reject();
-			// 			});
-			// 		}else{
-			// 			return reject(); 
-			// 		}
-			// 	});
-			// }
+			auth: function(body){
+				return new Promise(function(resolve, reject){
+					if ( typeof body.email === 'string' && typeof body.email != 'undefine' && body.email != '' && typeof body.password === 'string' && typeof body.password != 'undefine' && body.password != ''){
+						user.findOne({
+							where:{
+								email: body.email
+							}
+						}).then(function(user){
+							if(!user || !bcrypt.compareSync(body.password, user.get('password_hash'))){
+								return reject();
+							}
+							resolve(user);
+						}, function(e){
+							reject();
+						});
+					}else{
+						return reject(); 
+					}
+				});
+			},
+			findByToken: function(token){
+				return new Promise(function(resolve, reject){
+					try{
+						let decodedJWT = jwt.verify(token, 'qwerty098');
+						let bytes = cryptoJs.AES.decrypt(decodedJWT.token,'abc123!@#~!');
+						let tokenData = JSON.parse(bytes.toString(cryptoJs.enc.Uft8));
+						user.findById(tokenData.id).then(function(user){
+							if(user){
+								resolve(user);
+							}else{
+								reject();
+							}
+						}, function(e){
+							reject();
+						});
+					} catch(e){
+						reject();
+					}
+				});
+			}
+			// 
+			// 
 		},
 		instanceMethods: {
 			// toPublicJSON: function(){
