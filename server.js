@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const _ = require('underscore');
 let db = require('./db.js');
-
+let bcrypt = require('bcrypt');
 let todos = [];
 let todoNextId = 1;
 
@@ -122,7 +122,30 @@ app.post('/users', function (req, res){
 	});
 });
 
-db.sequelize.sync().then(()=>{
+//POST users/login 
+app.post('/users/login', function(req, res){
+	let body = _.pick(req.body, 'email', 'password');
+	if ( typeof body.email === 'string' && typeof body.email != 'undefine' && body.email != '' && typeof body.password === 'string' && typeof body.password != 'undefine' && body.password != ''){
+		db.user.findOne({
+			where:{
+				email: body.email
+			}
+		}).then(function(user){
+			if(!user || !bcrypt.compareSync(body.password, user.get('password_hash'))){
+				return res.status(401).send();
+			}
+			res.json(user.email);
+		}, function(e){
+			res.status(500).send();
+		});
+	}else{
+		return res.status(400).send(); 
+	}
+
+
+});
+
+db.sequelize.sync({force:true}).then(()=>{
 	app.listen(port, () => {
 		console.log('Server running on port: ' + port);
 	});	
