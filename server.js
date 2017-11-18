@@ -134,6 +134,14 @@ app.post('/users/login', function(req, res){
 			if(!user || !bcrypt.compareSync(body.password, user.get('password_hash'))){
 				return res.status(401).send();
 			}
+			// let token = user.generateToken('authentication');
+			
+			// if(token){
+			//  	res.header('Auth', token).json(user.email);
+			// }else{
+			// 	res.status(401).send();
+			// }
+
 			res.json(user.email);
 		}, function(e){
 			res.status(500).send();
@@ -141,11 +149,9 @@ app.post('/users/login', function(req, res){
 	}else{
 		return res.status(400).send(); 
 	}
-
-
 });
 
-db.sequelize.sync({force:true}).then(()=>{
+db.sequelize.sync().then(()=>{
 	app.listen(port, () => {
 		console.log('Server running on port: ' + port);
 	});	
